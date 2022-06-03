@@ -3,7 +3,8 @@ const { Schema, model, Types } = require("mongoose");
 const TaskSchema = new Schema(
   {
     description: { type: String, required: true },
-    date: { type: Date, required: true },
+    date: { type: String, required: true },
+    dateTime: { type: String },
     duration: { type: Number, required: true, default: 60 },
     reminder: { type: Boolean, default: false },
     timeReminder: { type: Number, default: 0 }, //Avaliar se realmente colocaremos um tempo ou se vai ser padrão (5min)
