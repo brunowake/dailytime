@@ -25,3 +25,6 @@ app.use("/api", userRouter);
 
 const eventRouter = require("./routes/event.routes");
 app.use("/", eventRouter);
+
+const taskRouter = require("./routes/task.route");
+app.use("/", taskRouter);
