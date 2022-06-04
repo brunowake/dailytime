@@ -5,8 +5,17 @@ const UserModel = require("../models/User.model");
 const generateToken = require("../config/jwt.config");
 const isAuthenticated = require("../middlewares/isAuthenticated");
 const attachCurrentUser = require("../middlewares/attachCurrentUser");
+const uploader = require("../config/cloudinary.config");
 
 const salt_rounds = 10;
+
+router.post("/upload", uploader.single("picture"), async (req, res) => {
+  if (!req.file) {
+    return res.status(500).json({ msg: "your file hasn't been uploaded" });
+  }
+
+  return res.status(201).json({ fileUrl: req.file.path });
+});
 
 // Crud (CREATE) - HTTP POST
 // Criar um novo usuário
