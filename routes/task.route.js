@@ -3,19 +3,24 @@ const isAuthenticated = require("../middlewares/isAuthenticated");
 const attachCurrentUser = require("../middlewares/attachCurrentUser");
 const TaskModel = require("../models/Task.model");
 
-router.post("/task", isAuthenticated, attachCurrentUser, async (req, res) => {
-  try {
-    const data = req.body;
-    const { _id } = req.currentUser;
+router.post(
+  "/newtask",
+  isAuthenticated,
+  attachCurrentUser,
+  async (req, res) => {
+    try {
+      const data = req.body;
+      const { _id } = req.currentUser;
 
-    const result = await TaskModel.create({ ...data, userId: _id });
+      const result = await TaskModel.create({ ...data, userId: _id });
 
-    return res.status(201).json(result);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ msg: "Failed to register task" });
+      return res.status(201).json(result);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ msg: "Failed to register task" });
+    }
   }
-});
+);
 
 router.get("/task", isAuthenticated, attachCurrentUser, async (req, res) => {
   try {
@@ -61,7 +66,7 @@ router.patch(
       const data = req.body;
 
       const result = await TaskModel.findOneAndUpdate(
-        { _id, userId },
+        { _id, userId: req.currentUser._id },
         { $set: data },
         { new: true, runValidators: true }
       );
@@ -69,6 +74,8 @@ router.patch(
       if (!result) {
         return res.status(404).json({ msg: "Task not found" });
       }
+
+      return res.status(200).json(result);
     } catch (err) {
       console.error(err);
       return res.status(500).json({ msg: "Failed to edit task" });
@@ -77,7 +84,7 @@ router.patch(
 );
 
 router.delete(
-  "/task/:id",
+  "/task/:_id",
   isAuthenticated,
   attachCurrentUser,
   async (req, res) => {
@@ -92,9 +99,11 @@ router.delete(
       if (result.deletedCount < 1) {
         return res.status(404).json({ msg: "Task not found" });
       }
+
+      return res.status(200).json({});
     } catch (err) {
       console.error(err);
-      return res.status(500).json({ msg: "Failed to edit task" });
+      return res.status(500).json({ msg: "Failed to delete task" });
     }
   }
 );
