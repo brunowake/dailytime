@@ -1,7 +1,8 @@
 const router = require("express").Router();
 const isAuthenticated = require("../middlewares/isAuthenticated");
 const attachCurrentUser = require("../middlewares/attachCurrentUser");
-const InviteModel = require("../models/Task.model");
+const InviteModel = require("../models/Invite.model");
+const EventModel = require("../models/Event.model");
 
 router.post(
   "/newinvite",
@@ -12,7 +13,16 @@ router.post(
       const data = req.body;
       const { _id } = req.currentUser;
 
-      const result = await InviteModel.create({ ...data, userId: _id });
+      const result = await InviteModel.create({
+        eventId: data.eventId,
+        userId: _id,
+        email: data.email,
+      });
+
+      //   inserir Id do invite criado no campo inviteId do evento
+      //   if(!result){
+      //      const event = await EventModel.findOneAndUpdate({_id:data._Id}, { $push: { inviteId: result._id } });
+      //   }
 
       return res.status(201).json(result);
     } catch (err) {
@@ -28,7 +38,7 @@ router.get(
   attachCurrentUser,
   async (req, res) => {
     try {
-      const { _id } = req.params;
+      const { _id } = req.params; //invite que pertence ao evento
       const result = await InviteModel.find({
         eventId: _id,
       });
@@ -47,7 +57,8 @@ router.get(
   attachCurrentUser,
   async (req, res) => {
     try {
-      const { email } = req.currentUser;
+      const { email } = req.currentUser; // invite do usuario logado
+      console.log(req.currentUser);
       const result = await InviteModel.find({
         email,
       });
@@ -83,3 +94,5 @@ router.delete(
     }
   }
 );
+
+module.exports = router;

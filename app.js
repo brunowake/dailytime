@@ -21,10 +21,13 @@ db()
   .catch((err) => console.error(err));
 
 const userRouter = require("./routes/user.routes");
-app.use("/api", userRouter);
+app.use("/", userRouter);
 
 const eventRouter = require("./routes/event.routes");
 app.use("/", eventRouter);
 
 const taskRouter = require("./routes/task.route");
 app.use("/", taskRouter);
+
+const inviteRouter = require("./routes/invite.route");
+app.use("/", inviteRouter);
