@@ -10,6 +10,8 @@ const UserSchema = new Schema({
     lowercase: true,
   },
   passwordHash: { type: String, required: true },
+  profilePicture: { type: String },
+  myInvites: { type: Schema.Types.ObjectId, ref: "Invite" },
 });
 
 const UserModel = model("User", UserSchema);
