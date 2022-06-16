@@ -4,6 +4,7 @@ const eventSchema = new Schema(
   {
     createdBy: { type: Schema.Types.ObjectId, ref: "User" },
     name: { type: String, required: true },
+    category: { type: String, required: true },
     date: { type: Date, required: true },
     duration: { type: Number, min: 0, default: 60 },
     description: { type: String, maxlength: 500 },

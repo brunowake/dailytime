@@ -63,15 +63,15 @@ router.get(
   async (req, res) => {
     try {
       const { date } = req.params;
-
       const dayAfter = addDays(new Date(date), 1);
-      console.log(dayAfter);
       const task = await TaskModel.find({
         dateTime: { $gte: new Date(date), $lt: dayAfter },
       }).sort({ datetime: -1 });
 
       if (!task) {
-        return res.status(404).json({ msg: date });
+        return res
+          .status(404)
+          .json({ msg: "Failed to find tasks for this day." });
       }
 
       return res.status(202).json(task);
