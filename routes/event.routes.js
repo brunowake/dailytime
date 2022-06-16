@@ -29,6 +29,32 @@ router.get("/event", isAuthenticated, attachCurrentUser, async (req, res) => {
 });
 
 router.get(
+  "/eventbydate/:date",
+  isAuthenticated,
+  attachCurrentUser,
+  async (req, res) => {
+    try {
+      const { date } = req.params;
+
+      const dayAfter = addDays(new Date(date), 1);
+
+      const events = await TaskModel.find({
+        date: { $gte: new Date(date), $lt: dayAfter },
+      }).sort({ date: -1 });
+
+      if (!events) {
+        return res.status(404).json({ msg: date });
+      }
+
+      return res.status(202).json(events);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ msg: "Failed to find events" });
+    }
+  }
+);
+
+router.get(
   "/event/:_id",
   isAuthenticated,
   attachCurrentUser,

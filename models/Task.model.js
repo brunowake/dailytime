@@ -3,9 +3,10 @@ const { Schema, model, Types } = require("mongoose");
 const TaskSchema = new Schema(
   {
     name: { type: String, required: true },
+    category: { type: String, required: true },
     description: { type: String },
     icon: { type: String }, // colocar como requerido e colocar o default
-    color: { type: String, required: true },
+    color: { type: String },
     dateTime: { type: Date, required: true },
     duration: { type: Number, required: true, default: 60 },
     reminder: { type: Boolean, default: false },

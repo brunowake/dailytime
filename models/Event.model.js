@@ -4,11 +4,11 @@ const eventSchema = new Schema(
   {
     createdBy: { type: Schema.Types.ObjectId, ref: "User" },
     name: { type: String, required: true },
+    category: { type: String, required: true },
     date: { type: Date, required: true },
-    dateTime: Number,
-    duration: { type: Number, min: 0, required: true, default: 60 },
+    duration: { type: Number, min: 0, default: 60 },
     description: { type: String, maxlength: 500 },
-    address: String,
+    timeReminder: { type: Number, min: 0 },
     //   inviteId: [{ type: Schema.Types.ObjectId, ref: "Invites" }],
   },
   { timestamps: true }
