@@ -41,7 +41,9 @@ router.get(
       const { _id } = req.params; //invite que pertence ao evento
       const result = await InviteModel.find({
         eventId: _id,
-      });
+      })
+        .populate("userId")
+        .populate("eventId");
 
       return res.status(201).json(result);
     } catch (err) {
@@ -61,12 +63,43 @@ router.get(
       console.log(req.currentUser);
       const result = await InviteModel.find({
         email,
-      });
+      })
+        .populate("userId")
+        .populate("eventId");
 
       return res.status(201).json(result);
     } catch (err) {
       console.error(err);
       return res.status(500).json({ msg: "Failed to find invites" });
+    }
+  }
+);
+
+router.patch(
+  "/invite/:_id",
+  isAuthenticated,
+  attachCurrentUser,
+  async (req, res) => {
+    try {
+      const { _id } = req.params;
+      const { confirmacao } = req.body;
+
+      console.log(confirmacao);
+
+      const result = await InviteModel.findOneAndUpdate(
+        { _id },
+        { confirmacao },
+        { new: true, runValidators: true }
+      );
+
+      if (!result) {
+        return res.status(404).json({ msg: "Invite not found" });
+      }
+
+      return res.status(202).json(result);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ msg: "Failed to edit Invite" });
     }
   }
 );
@@ -78,7 +111,6 @@ router.delete(
   async (req, res) => {
     try {
       const { _id } = req.params;
-
       const result = await InviteModel.deleteOne({
         _id,
       });
