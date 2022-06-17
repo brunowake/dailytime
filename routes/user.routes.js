@@ -9,13 +9,18 @@ const uploader = require("../config/cloudinary.config");
 
 const salt_rounds = 10;
 
-router.post("/upload", uploader.single("picture"), async (req, res) => {
-  if (!req.file) {
-    return res.status(500).json({ msg: "your file hasn't been uploaded" });
-  }
+router.post(
+  "/upload",
+  isAuthenticated,
+  uploader.single("picture"),
+  async (req, res) => {
+    if (!req.file) {
+      return res.status(500).json({ msg: "your file hasn't been uploaded" });
+    }
 
-  return res.status(201).json({ fileUrl: req.file.path });
-});
+    return res.status(201).json({ fileUrl: req.file.path });
+  }
+);
 
 // Crud (CREATE) - HTTP POST
 // Criar um novo usuário
@@ -123,5 +128,56 @@ router.get("/profile", isAuthenticated, attachCurrentUser, (req, res) => {
     return res.status(500).json({ msg: JSON.stringify(err) });
   }
 });
+
+router.patch(
+  "/profile",
+  isAuthenticated,
+  attachCurrentUser,
+  async (req, res) => {
+    try {
+      const { _id, password, confirmPassword, email, name } = req.body;
+      const user = await UserModel.findOne({ email });
+
+      // se o campo senha estiver preenchido significa que o usuario irá alterar a senha
+      // caso contrario o usuario ira alterar somento nome ou foto
+      if (!!password && password === confirmPassword) {
+        const salt = await bcrypt.genSalt(salt_rounds);
+
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const response = await UserModel.findOneAndUpdate(
+          { _id },
+          { passwordHash: hashedPassword },
+          { new: true, runValidators: true }
+        );
+        return;
+      }
+
+      const response = await UserModel.findOneAndUpdate(
+        { _id },
+        { email, name },
+        { new: true, runValidators: true }
+      );
+
+      if (!response) {
+        return res.status(404).json({ msg: "User not found. Update failed" });
+      }
+
+      const token = generateToken(user);
+
+      return res.status(200).json({
+        user: {
+          name: user.name,
+          email: user.email,
+          _id: user._id,
+        },
+        token,
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ msg: JSON.stringify(err) });
+    }
+  }
+);
 
 module.exports = router;
