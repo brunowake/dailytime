@@ -135,11 +135,14 @@ router.patch(
   attachCurrentUser,
   async (req, res) => {
     try {
-      const { _id, password, confirmPassword, email, name } = req.body;
+      const { _id, password, confirmPassword, email, name, profilePicture } =
+        req.body;
+
       const user = await UserModel.findOne({ email });
 
       // se o campo senha estiver preenchido significa que o usuario irá alterar a senha
-      // caso contrario o usuario ira alterar somento nome ou foto
+      // caso contrario o usuario ira alterar somento nome e/ou foto
+
       if (!!password && password === confirmPassword) {
         const salt = await bcrypt.genSalt(salt_rounds);
 
@@ -150,12 +153,37 @@ router.patch(
           { passwordHash: hashedPassword },
           { new: true, runValidators: true }
         );
-        return;
+        return res.status(200).json({ response });
+      }
+
+      //verifica se somente o primeiro campo de alterar senha esta preenchido
+      if (!!password) {
+        return res.status(404).json({
+          msg: "Password should match or be null to update only name",
+        });
+      }
+
+      //verifica se o usuario vai alterar a foto de perfil
+      if (!profilePicture) {
+        const response = await UserModel.findOneAndUpdate(
+          { _id },
+          { name },
+          { new: true, runValidators: true }
+        );
+
+        return res.status(200).json({
+          user: {
+            name: user.name,
+            email: user.email,
+            _id: user._id,
+            profilePicture: user.profilePicture,
+          },
+        });
       }
 
       const response = await UserModel.findOneAndUpdate(
         { _id },
-        { email, name },
+        { name, profilePicture },
         { new: true, runValidators: true }
       );
 
@@ -163,15 +191,13 @@ router.patch(
         return res.status(404).json({ msg: "User not found. Update failed" });
       }
 
-      const token = generateToken(user);
-
       return res.status(200).json({
         user: {
           name: user.name,
           email: user.email,
           _id: user._id,
+          profilePicture: user.profilePicture,
         },
-        token,
       });
     } catch (err) {
       console.error(err);
