@@ -62,11 +62,13 @@ router.get(
   attachCurrentUser,
   async (req, res) => {
     try {
+      const { _id } = req.currentUser;
       const { date } = req.params;
       const dayAfter = addDays(new Date(date), 1);
       const task = await TaskModel.find({
+        userId: _id,
         dateTime: { $gte: new Date(date), $lt: dayAfter },
-      }).sort({ datetime: -1 });
+      }).sort({ dateTime: -1 });
 
       if (!task) {
         return res
