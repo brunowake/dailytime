@@ -2,6 +2,7 @@ const router = require("express").Router();
 const isAuthenticated = require("../middlewares/isAuthenticated");
 const attachCurrentUser = require("../middlewares/attachCurrentUser");
 const TaskModel = require("../models/Task.model");
+const addDays = require("date-fns/addDays");
 
 router.post(
   "/newtask",
@@ -55,6 +56,32 @@ router.get(
   }
 );
 
+router.get(
+  "/taskbydate/:date",
+  isAuthenticated,
+  attachCurrentUser,
+  async (req, res) => {
+    try {
+      const { date } = req.params;
+      const dayAfter = addDays(new Date(date), 1);
+      const task = await TaskModel.find({
+        dateTime: { $gte: new Date(date), $lt: dayAfter },
+      }).sort({ datetime: -1 });
+
+      if (!task) {
+        return res
+          .status(404)
+          .json({ msg: "Failed to find tasks for this day." });
+      }
+
+      return res.status(202).json(task);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ msg: "Failed to find task" });
+    }
+  }
+);
+
 router.patch(
   "/task/:_id",
   isAuthenticated,
@@ -97,7 +124,7 @@ router.delete(
       });
 
       if (result.deletedCount < 1) {
-        return res.status(404).json({ msg: "Task not found" });
+        return res.status(404).json({ msg: "Task not found to be deleted" });
       }
 
       return res.status(200).json({});
