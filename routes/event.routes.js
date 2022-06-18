@@ -62,7 +62,7 @@ router.get(
     try {
       const { _id } = req.params;
 
-      const event = await EventModel.findOne({ _id });
+      const event = await EventModel.findOne({ _id }).populate("invites");
 
       if (!event) {
         return res.status(404).json({ msg: "Event not found" });
