@@ -31,3 +31,6 @@ app.use("/", taskRouter);
 
 const inviteRouter = require("./routes/invite.route");
 app.use("/", inviteRouter);
+
+const timelineRouter = require("./routes/timeline.routes");
+app.use("/", timelineRouter);
