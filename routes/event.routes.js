@@ -8,7 +8,7 @@ router.post("/event", isAuthenticated, attachCurrentUser, async (req, res) => {
     const data = req.body;
     const { _id } = req.currentUser;
 
-    const result = await EventModel.create({ ...data, createdBy: _id });
+    const result = await EventModel.create({ ...data, userId: _id });
 
     return res.status(201).json(result);
   } catch (err) {
@@ -34,16 +34,18 @@ router.get(
   attachCurrentUser,
   async (req, res) => {
     try {
+      const { _id } = req.user;
       const { date } = req.params;
 
       const dayAfter = addDays(new Date(date), 1);
 
       const events = await TaskModel.find({
-        date: { $gte: new Date(date), $lt: dayAfter },
-      }).sort({ date: -1 });
+        userId: _id,
+        dateTime: { $gte: new Date(date), $lt: dayAfter },
+      }).sort({ dateTime: -1 });
 
       if (!events) {
-        return res.status(404).json({ msg: date });
+        return res.status(404).json({ msg: "No events found on this day." });
       }
 
       return res.status(202).json(events);
@@ -86,7 +88,7 @@ router.patch(
       const data = req.body;
 
       const result = await EventModel.findOneAndUpdate(
-        { _id, createdBy: req.currentUser._id },
+        { _id, userId: req.currentUser._id },
         { $set: data },
         { new: true, runValidators: true }
       );
@@ -113,7 +115,7 @@ router.delete(
 
       const result = await EventModel.deleteOne({
         _id,
-        createdBy: req.currentUser._id,
+        userId: req.currentUser._id,
       });
       console.log(result);
       if (result.deletedCount < 1) {
