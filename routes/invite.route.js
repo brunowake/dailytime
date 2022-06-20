@@ -57,16 +57,16 @@ router.get(
 );
 
 router.get(
-  "/myinvites",
+  "/myinvites/:_id?",
   isAuthenticated,
   attachCurrentUser,
   async (req, res) => {
     try {
+      const { _id } = req.params;
       const { email } = req.currentUser; // invite do usuario logado
-      console.log(req.currentUser);
-      const result = await InviteModel.find({
-        email,
-      })
+      console.log(req);
+      const query = _id ? { eventId: _id } : { email };
+      const result = await InviteModel.find(query)
         .populate("userId")
         .populate("eventId");
 

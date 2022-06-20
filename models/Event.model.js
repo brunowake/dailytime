@@ -9,7 +9,8 @@ const eventSchema = new Schema(
     duration: { type: Number, min: 0, default: 60 },
     description: { type: String, maxlength: 500 },
     timeReminder: { type: Number, min: 0 },
-    inviteId: [{ type: Schema.Types.ObjectId, ref: "Invites" }],
+    invites: [{ type: Schema.Types.ObjectId, ref: "Invite" }],
+
   },
   { timestamps: true }
 );
