@@ -19,10 +19,13 @@ router.post(
         email: data.email,
       });
 
-      //   inserir Id do invite criado no campo inviteId do evento
-      //   if(!result){
-      //      const event = await EventModel.findOneAndUpdate({_id:data._Id}, { $push: { inviteId: result._id } });
-      //   }
+      // inserir Id do invite criado no campo inviteId do evento
+      if (!result) {
+        const event = await EventModel.findOneAndUpdate(
+          { _id: data._Id },
+          { $push: { inviteId: result._id } }
+        );
+      }
 
       return res.status(201).json(result);
     } catch (err) {
