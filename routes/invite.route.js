@@ -20,10 +20,11 @@ router.post(
       });
 
       // inserir Id do invite criado no campo inviteId do evento
-      if (!result) {
+      if (result) {
         const event = await EventModel.findOneAndUpdate(
-          { _id: data._Id },
-          { $push: { inviteId: result._id } }
+          { _id: data.eventId },
+          { $push: { invites: result._id } },
+          { new: true, runValidators: true }
         );
       }
 
