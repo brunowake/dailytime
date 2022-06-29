@@ -31,7 +31,6 @@ router.post("/signup", async (req, res) => {
   try {
     // Recuperar a senha que está vindo do corpo da requisição
     const { password } = req.body;
-
     // Verifica se a senha não está em branco ou se a senha não é complexa o suficiente
     if (
       !password ||
@@ -56,7 +55,7 @@ router.post("/signup", async (req, res) => {
       ...req.body,
       passwordHash: hashedPassword,
     });
-
+    console.log("entrou try", result);
     // Responder o usuário recém-criado no banco para o cliente (solicitante). O status 201 significa Created
     return res.status(201).json(result);
   } catch (err) {
