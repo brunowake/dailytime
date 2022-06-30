@@ -10,7 +10,6 @@ const eventSchema = new Schema(
     description: { type: String, maxlength: 500 },
     timeReminder: { type: Number, min: 0 },
     invites: [{ type: Schema.Types.ObjectId, ref: "Invite" }],
-
   },
   { timestamps: true }
 );
